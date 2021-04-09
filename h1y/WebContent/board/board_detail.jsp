@@ -7,6 +7,43 @@
 request.setCharacterEncoding("utf-8");
 int boardId = Integer.parseInt(request.getParameter("b_Id"));
 BoardDAO boardDAO = new BoardDAO();
+
+String session_param = (String)session.getAttribute("key");
+
+//조회수 새로고침 중복 방지를 위한 쿠키 생성
+Cookie[] cookies = request.getCookies();
+boolean hit = true;
+		
+for ( Cookie cookie : cookies ) {
+			
+	System.out.println("쿠키이름 : " + cookie.getName());
+	
+	// hit <- 쿠키가 존재하면 boolean hit false
+	if ( cookie.getName().equals("hit") ) {
+				
+		hit = false;
+		// 해당 번호의 게시글 조회수 증가 기록이 있다면
+		if ( cookie.getValue().contains(request.getParameter("b_Id")) ) {
+			System.out.println(boardId + " 게시글 조회수 증가 쿠키 존재");
+		} 
+		// hit쿠키에 boardId 번호가 존재하지 않다면 조회수 증가 로직수행
+		else {		
+			cookie.setValue(cookie.getValue() + "_" + request.getParameter("b_Id"));
+			response.addCookie(cookie);
+			boardDAO.getUpHit(boardId);
+		}
+				
+	}
+			
+}
+// 생성된 쿠키가 없으면 쿠키생성후 조회수 증가 로직수행 
+if( hit ) {
+	Cookie cookie1 = new Cookie("hit", request.getParameter("b_Id"));
+	response.addCookie(cookie1);
+	boardDAO.getUpHit(boardId);
+}
+
+// 페이지에 조회수 반영을 위해 맨 아래로
 BoardDTO boardDetail = boardDAO.getBoardDetail(boardId);
 %>
 <html>
@@ -18,25 +55,6 @@ BoardDTO boardDetail = boardDAO.getBoardDetail(boardId);
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
-<script>
-const urlParams = new URLSearchParams(location.search);
-
-function paramMaintain(){
-	urlParams.delete('b_Id');
-	location.href="./board_list.jsp?" + urlParams;
-}
-
-function updateBoard(){
-	location.href="./board_modify.jsp?" + urlParams + "&DP=U"
-}
-	
-function deleteBoard(boardId) {
-	if( confirm("게시글을 삭제하시겠습니까?")==true ) {
-		alert("삭제되었습니다.");
-		location.href="./board_delete_action.jsp?" + urlParams;
-	}
-}
-</script>
 <body>
 
 <%@ include file="/include/nav.jsp" %>
@@ -84,9 +102,9 @@ function deleteBoard(boardId) {
 	    </table>
 	    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 		    <!-- <a href="./board_list.jsp" class="btn btn-outline-dark">목록</a> -->
-		    <a href="javascript:paramMaintain();" class="btn btn-outline-dark">목록</a>
-		    <a href="javascript:updateBoard()" class="btn btn-outline-success">수정</a>
-		    <a href="javascript:deleteBoard(<%= boardDetail.getBoardId() %>);" class="btn btn-outline-danger">삭제</a>
+		    <a href="./board_list.jsp<%=session_param %>" class="btn btn-outline-dark">목록</a>
+		    <a href="./board_modify.jsp?b_Id=<%= boardId %>&IUD=U" class="btn btn-outline-success">수정</a>
+		    <a href="./board_action.jsp?b_Id=<%= boardId %>&IUD=D" class="btn btn-outline-danger">삭제</a>
 		</div>
 	</div>
 	

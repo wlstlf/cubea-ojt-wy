@@ -1,3 +1,4 @@
+<%@page import="util.MyUtil"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="dto.BoardDTO"%>
 <%@page import="java.util.List"%>
@@ -7,6 +8,13 @@
 <!DOCTYPE html>
 <%
 request.setCharacterEncoding("utf-8");
+
+MyUtil param = new MyUtil();
+
+String session_param = param.urlParameterUtil(request);
+
+session.setAttribute("key", session_param);
+
 String category = request.getParameter("category") == null ? "" : request.getParameter("category");
 String text = request.getParameter("text") == null ? "" : request.getParameter("text");
 int pageNum = Integer.parseInt(request.getParameter("pageNum") == null ? "1" : request.getParameter("pageNum"));
@@ -24,19 +32,15 @@ List<BoardDTO> boardList = boardDAO.getBoardList(pageNum, category, text);
 <title>Insert title here</title>
 </head>
 <script>
-var url_param = window.location.search;
+function boardSearch(){
+	
+	$("#searchForm").submit();
+	
+}
 
 function paramMaintain(boardId){
-		
-	boardId = url_param == '' ? "?b_Id=" + boardId : "&b_Id=" + boardId;
-		
-	location.href="./board_detail.jsp" + url_param + boardId;
-		
+	location.href="./board_detail.jsp?b_Id=" + boardId;
 	}
-	
-function createBoard(){
-	location.href="./board_modify.jsp" + url_param + "&DP=C";
-}
 </script>
 <body>
 <%@ include file="/include/nav.jsp" %>
@@ -46,7 +50,7 @@ function createBoard(){
 	</div>
 	<p style="font-size: 15px; margin-bottom: 20px;">
 		<b>총 : <%= count %></b>
-		<a href="javascript:createBoard();" class="btn btn-primary" style="float: right;">등록</a>
+		<a href="./board_modify.jsp?IUD=I" class="btn btn-primary" style="float: right;">등록</a>
 	</p>
 	<table class="table table-hover">
 		<colgroup>
@@ -90,7 +94,7 @@ function createBoard(){
 	
 	<!-- <hr>
 	<a class="btn btn-default pull-right">글쓰기</a> -->
-	<form action="./board_list.jsp" method="get">
+	<form action="./board_list.jsp" id="searchForm" method="get">
 	<div class="search row">
 		<div class="col-xs-2 col-sm-2">
 			<select class="form-control" name="category">
@@ -103,7 +107,7 @@ function createBoard(){
 			<div class="input-group">
 				<input type="text" class="form-control" name="text"/>
 				<span class="input-group-btn">
-					<button type="submit" class="btn btn-primary">검색</button>
+					<button type="button" class="btn btn-primary" onclick="boardSearch()">검색</button>
 				</span>
 			</div>
 		</div>
@@ -117,8 +121,8 @@ function createBoard(){
     		<%
 				int totalPage = 0;
 				
-				if ( count % 10 == 0 ) totalPage = count / 10;
-				else totalPage = (count / 10) + 1;
+				if ( count % 5 == 0 ) totalPage = count / 5;
+				else totalPage = (count / 5) + 1;
 				
 				for(int i=1; i<=totalPage; i++){ 
 			%>
