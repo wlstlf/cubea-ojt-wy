@@ -1,3 +1,4 @@
+<%@page import="util.MyUtil"%>
 <%@page import="dto.BoardDTO"%>
 <%@page import="dao.BoardDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -5,7 +6,10 @@
 <!DOCTYPE html>
 <%
 request.setCharacterEncoding("utf-8");
-int boardId = Integer.parseInt(request.getParameter("b_Id"));
+int boardId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0); //Integer.parseInt(request.getParameter("b_Id"));
+
+if ( boardId == 0 ) out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
+
 BoardDAO boardDAO = new BoardDAO();
 
 String session_param = (String)session.getAttribute("key");
@@ -15,15 +19,13 @@ Cookie[] cookies = request.getCookies();
 boolean hit = true;
 		
 for ( Cookie cookie : cookies ) {
-			
-	System.out.println("쿠키이름 : " + cookie.getName());
 	
 	// hit <- 쿠키가 존재하면 boolean hit false
 	if ( cookie.getName().equals("hit") ) {
 				
 		hit = false;
 		// 해당 번호의 게시글 조회수 증가 기록이 있다면
-		if ( cookie.getValue().contains(request.getParameter("b_Id")) ) {
+		if ( cookie.getValue().contains( MyUtil.NullPointerExUtil(request.getParameter("b_Id"), "")) ) {
 			System.out.println(boardId + " 게시글 조회수 증가 쿠키 존재");
 		} 
 		// hit쿠키에 boardId 번호가 존재하지 않다면 조회수 증가 로직수행
@@ -45,6 +47,7 @@ if( hit ) {
 
 // 페이지에 조회수 반영을 위해 맨 아래로
 BoardDTO boardDetail = boardDAO.getBoardDetail(boardId);
+String boardContentNewLine = boardDetail.getBoardContent().replace("\r\n", "<br>");
 %>
 <html>
 <head>
@@ -84,7 +87,7 @@ BoardDTO boardDetail = boardDAO.getBoardDetail(boardId);
 	            </tr>
 	            <tr>
 	                <th>내용</th>
-	                <td><%= boardDetail.getBoardContent() %></td>
+	                <td><%= boardContentNewLine %></td>
 	            </tr>
 	            <tr>
 	                <th>등록일</th>

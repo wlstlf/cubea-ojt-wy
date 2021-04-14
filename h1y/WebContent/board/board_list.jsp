@@ -1,3 +1,4 @@
+<%@page import="util.PagingUtil"%>
 <%@page import="util.MyUtil"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="dto.BoardDTO"%>
@@ -9,18 +10,18 @@
 <%
 request.setCharacterEncoding("utf-8");
 
-MyUtil param = new MyUtil();
-
-String session_param = param.urlParameterUtil(request);
+String session_param = MyUtil.urlParameterUtil(request);
 
 session.setAttribute("key", session_param);
 
-String category = request.getParameter("category") == null ? "" : request.getParameter("category");
-String text = request.getParameter("text") == null ? "" : request.getParameter("text");
-int pageNum = Integer.parseInt(request.getParameter("pageNum") == null ? "1" : request.getParameter("pageNum"));
+String category = MyUtil.NullPointerExUtil(request.getParameter("category"), "");
+String text = MyUtil.NullPointerExUtil(request.getParameter("text"), "");
+int pageNum = MyUtil.NumberFormatExUtil(request.getParameter("pageNum"), 1);
 BoardDAO boardDAO = new BoardDAO();
 int count = boardDAO.getBoardListCount(category,text);
 List<BoardDTO> boardList = boardDAO.getBoardList(pageNum, category, text);
+
+PagingUtil paging = new PagingUtil( count, 6 );
 %>
 <html>
 <head>
@@ -31,17 +32,6 @@ List<BoardDTO> boardList = boardDAO.getBoardList(pageNum, category, text);
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
-<script>
-function boardSearch(){
-	
-	$("#searchForm").submit();
-	
-}
-
-function paramMaintain(boardId){
-	location.href="./board_detail.jsp?b_Id=" + boardId;
-	}
-</script>
 <body>
 <%@ include file="/include/nav.jsp" %>
 <div class="container">
@@ -79,7 +69,7 @@ function paramMaintain(boardId){
 			<tr>
 				<td><%=board.getBoardId() %></td>
 				<%-- <td><a href="./board_detail.jsp?b_Id=<%=board.getBoardId() %>"><%=board.getBoardTitle() %></a></td> --%>
-				<td><a href="javascript:paramMaintain(<%=board.getBoardId()%>)"><%=board.getBoardTitle() %></a></td>
+				<td><a href="./board_detail.jsp?b_Id=<%= board.getBoardId() %>"><%=board.getBoardTitle() %></a></td>
 				<td><%=board.getBoardWriter() %></td>
 				<td><%=board.getBoardCreateDate() %></td>
 				<td><%=board.getBoardUpdateDate() %></td>
@@ -107,7 +97,7 @@ function paramMaintain(boardId){
 			<div class="input-group">
 				<input type="text" class="form-control" name="text"/>
 				<span class="input-group-btn">
-					<button type="button" class="btn btn-primary" onclick="boardSearch()">검색</button>
+					<button type="submit" class="btn btn-primary">검색</button>
 				</span>
 			</div>
 		</div>
@@ -118,7 +108,17 @@ function paramMaintain(boardId){
     			<!-- <li class="page-item disabled">
       				<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
     			</li> -->
+    			
     		<%
+				for(int i=1; i<=paging.getList().size(); i++){ 
+			%>
+    			<li class="page-item">
+    				<a class="page-link" href="./board_list.jsp?pageNum=<%=i %>&category=<%= category %>&text=<%= text %>"><%=i %></a>
+    			</li>
+    		<%
+				} 
+			%>
+    		<%-- <%
 				int totalPage = 0;
 				
 				if ( count % 5 == 0 ) totalPage = count / 5;
@@ -131,7 +131,8 @@ function paramMaintain(boardId){
     			</li>
     		<%
 				} 
-			%>
+			%> --%>
+			
     			<!-- <li class="page-item active" aria-current="page">
       				<a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
     			</li>

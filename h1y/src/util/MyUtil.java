@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class MyUtil {
 	
-	// alert 노출 후 이동
-	public String alertAndLocationUtil( String alertMessage ,String locationUrl ) {
+	// DB 작업 수행 후 alert과 location을 통해 페이지 이동을 위한 Util
+	public static String alertAndLocationUtil( String alertMessage ,String locationUrl ) {
 		
 		StringBuffer sb = new StringBuffer();
 		
@@ -23,8 +23,8 @@ public class MyUtil {
 		
 	}
 	
-	public String urlParameterUtil(HttpServletRequest request) {
-		
+	// 검색조건 유지를 위해 세션에 검색조건을 담아줄 Util
+	public static String urlParameterUtil(HttpServletRequest request) {
 		
 		Enumeration params = request.getParameterNames();
 		
@@ -45,6 +45,42 @@ public class MyUtil {
 		
 		return strParam.toString();
 		
+	}
+	
+	// NumberFormatException 방지를 위한 Util
+	public static int NumberFormatExUtil(String str, int defaultNum) {
+		
+		int parseInt = 0;
+		
+		try {
+			
+			parseInt = Integer.parseInt(str);
+			
+		} catch (NumberFormatException e) {
+			
+			parseInt = defaultNum;
+			System.out.println("NumberFormatExUtil Catch !!!");
+			
+		}
+		
+		return parseInt;
+		
+	}
+	
+	// NullPointerException 방지를 위한 Util
+	public static String NullPointerExUtil(String str, String defaultStr) {
+		
+		// 넘어온 값이 null인경우 입력한 값으로 return
+		if ( str == null ) return defaultStr;
+		
+		// 넘어온 값이 not null인경우 앞뒤 공백 제거후 return
+		if ( str != null ) {
+			
+			str = str.trim();
+			
+		}
+		
+		return str;
 	}
 	
 }

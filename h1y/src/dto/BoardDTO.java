@@ -17,35 +17,35 @@ public class BoardDTO {
 		this.boardId = boardId;
 	}
 	public String getBoardWriter() {
-		return boardWriter;
+		return boardWriter == null ? "" : boardWriter;
 	}
 	public void setBoardWriter(String boardWriter) {
 		if (boardWriter == null) boardWriter = "boardWriter Null";
 		this.boardWriter = boardWriter;
 	}
 	public String getBoardTitle() {
-		return boardTitle;
+		return boardTitle == null ? "" : boardTitle;
 	}
 	public void setBoardTitle(String boardTitle) {
 		if (boardTitle == null) boardTitle = "boardTitle Null";
 		this.boardTitle = boardTitle;
 	}
 	public String getBoardContent() {
-		return boardContent;
+		return boardContent == null ? "" : boardContent;
 	}
 	public void setBoardContent(String boardContent) {
 		if (boardContent == null) boardContent = "boardContent Null";
 		this.boardContent = boardContent;
 	}
 	public String getBoardCreateDate() {
-		return boardCreateDate;
+		return boardCreateDate == null ? "" : boardCreateDate;
 	}
 	public void setBoardCreateDate(String boardCreateDate) {
 		if (boardCreateDate == null) boardCreateDate = "boardCreateDate Null";
 		this.boardCreateDate = boardCreateDate;
 	}
 	public String getBoardUpdateDate() {
-		return boardUpdateDate;
+		return boardUpdateDate == null ? "" : boardUpdateDate;
 	}
 	public void setBoardUpdateDate(String boardUpdateDate) {
 		if (boardUpdateDate == null) boardUpdateDate = "boardUpdateDate Null";

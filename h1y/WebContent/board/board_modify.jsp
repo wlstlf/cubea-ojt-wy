@@ -1,3 +1,4 @@
+<%@page import="util.MyUtil"%>
 <%@page import="dto.BoardDTO"%>
 <%@page import="dao.BoardDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -5,7 +6,7 @@
 <!DOCTYPE html>
 <%
 request.setCharacterEncoding("utf-8");
-String iud = request.getParameter("IUD");
+String iud = MyUtil.NullPointerExUtil(request.getParameter("IUD"), "");
 int boardId = 0;
 
 BoardDAO boardDAO = new BoardDAO();
@@ -13,7 +14,10 @@ BoardDTO boardDetail = new BoardDTO();
 
 if ( iud.equals("U") ) {
 	
-	boardId = Integer.parseInt(request.getParameter("b_Id"));
+	boardId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0);
+	
+	if ( boardId == 0 ) out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
+	
 	boardDetail = boardDAO.getBoardDetail(boardId);
 	
 }
@@ -28,7 +32,7 @@ if ( iud.equals("U") ) {
 <title>Insert title here</title>
 </head>
 <body>
-<script type="text/javascript" src="../resources/js/board/board.js"></script>
+<!-- <script type="text/javascript" src="../resources/js/board/board.js"></script> -->
 <%@ include file="/include/nav.jsp" %>
 
 <div class="container">
@@ -49,7 +53,7 @@ if ( iud.equals("U") ) {
         <textarea class="form-control" id="content" name="content" rows="3" placeholder="내용을 입력하세요."><%= boardDetail.getBoardContent() == null ? "":boardDetail.getBoardContent() %></textarea>
       </div>
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      	<button type="button" onclick="modifySubmit()" class="btn btn-primary">등록</button>
+      	<button type="submit" class="btn btn-primary">등록</button>
       </div>
       	<input type="hidden" name="b_Id" id="b_Id" value="<%= boardId %>">
       	<input type="hidden" name="IUD" id="IUD" value="<%= iud %>">
