@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BoardMapper">
+	
+	<select id="getBoardListCount" parameterType="map" resultType="int">
+		SELECT COUNT(*) FROM BOARD
+		<if test='category.equals("T")'>
+		WHERE BOARD_TITLE LIKE '%' || #{text} || '%'
+		</if>
+		<if test='category.equals("C")'>
+		WHERE BOARD_CONTENT LIKE '%' || #{text} || '%'
+		</if>
+		<if test='category.equals("A")'>
+		WHERE BOARD_TITLE LIKE '%' || #{text} || '%' OR BOARD_CONTENT LIKE '%' || #{text} || '%'
+		</if>
+	</select>
+	
+	<select id="getBoardList" parameterType="map" resultType="map">
+		SELECT * FROM ( SELECT A.*, ROWNUM AS RN FROM ( SELECT * FROM BOARD 
+		<if test='category.equals("T")'>
+		WHERE BOARD_TITLE LIKE '%' || #{text} || '%'
+		</if>
+		<if test='category.equals("C")'>
+		WHERE BOARD_CONTENT LIKE '%' || #{text} || '%'
+		</if>
+		<if test='category.equals("A")'>
+		WHERE BOARD_TITLE LIKE '%' || #{text} || '%' OR BOARD_CONTENT LIKE '%' || #{text} || '%'
+		</if>
+		ORDER BY BOARD_ID DESC ) A ) WHERE RN <![CDATA[>=]]> #{startRow} AND RN <![CDATA[<=]]> #{endRow}
+	</select>
+	
+	<select id="getBoardDetail" parameterType="map" resultType="map">
+		SELECT * FROM BOARD WHERE BOARD_ID = #{boardId}
+	</select>
+	
+	<insert id="getBoardCreate" parameterType="map" useGeneratedKeys="true" keyColumn="BOARD_ID" keyProperty="boardId">
+		INSERT INTO BOARD (BOARD_ID,BOARD_WRITER,BOARD_TITLE,BOARD_CONTENT,BOARD_CREATE_DATE) VALUES (SEQ_BOARD_ID.NEXTVAL,#{writer},#{title},#{content},sysdate)
+	</insert>
+	
+	<update id="getBoardUpdate" parameterType="map">
+		UPDATE BOARD SET BOARD_WRITER = #{writer}, BOARD_TITLE = #{title}, BOARD_CONTENT = #{content}, BOARD_UPDATE_DATE = SYSDATE WHERE BOARD_ID = #{boardId}
+	</update>
+	
+	<delete id="getBoardDelete" parameterType="map">
+		DELETE FROM BOARD WHERE BOARD_ID = #{boardId}
+	</delete>
+	
+	<update id="getUpHit" parameterType="map">
+		UPDATE BOARD SET BOARD_HIT = NVL(BOARD_HIT,0) + 1 WHERE BOARD_ID = #{boardId}
+	</update>
+	
+</mapper>
