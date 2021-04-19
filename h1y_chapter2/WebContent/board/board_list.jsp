@@ -1,25 +1,28 @@
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.Map"%>
+<%@page import="dao.BoardMybatisDAO"%>
 <%@page import="util.PagingUtil"%>
 <%@page import="util.MyUtil"%>
-<%@page import="java.text.SimpleDateFormat"%>
-<%@page import="dto.BoardDTO"%>
 <%@page import="java.util.List"%>
-<%@page import="dao.BoardDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <%
 request.setCharacterEncoding("utf-8");
 
-String session_param = MyUtil.urlParameterUtil(request);
+SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+String session_param = MyUtil.urlParameterUtil(request);
 session.setAttribute("key", session_param);
+
+BoardMybatisDAO boardDao = new BoardMybatisDAO();
 
 String category = MyUtil.NullPointerExUtil(request.getParameter("category"), "");
 String text = MyUtil.NullPointerExUtil(request.getParameter("text"), "");
 int pageNum = MyUtil.NumberFormatExUtil(request.getParameter("pageNum"), 1);
-BoardDAO boardDAO = new BoardDAO();
-int count = boardDAO.getBoardListCount(category,text);
-List<BoardDTO> boardList = boardDAO.getBoardList(pageNum, category, text);
+
+int count = boardDao.getBoardListCount(category, text);
+List<Map<String, Object>> boardList = boardDao.getBoardList(pageNum, category, text);
 
 PagingUtil paging = new PagingUtil( count, 6 );
 %>
@@ -34,6 +37,7 @@ PagingUtil paging = new PagingUtil( count, 6 );
 </head>
 <body>
 <%@ include file="/include/nav.jsp" %>
+<%@ include file="/include/login_Check.jsp" %>
 <div class="container">
 	<div style="margin: 100px 0 50px 0;">
 		<h2 style="text-align: center;">게시판 리스트</h2>
@@ -63,17 +67,16 @@ PagingUtil paging = new PagingUtil( count, 6 );
 		</thead>
 		<tbody>
 			<% 
-			for(int i=0; i < boardList.size(); i++) {
-				BoardDTO board = boardList.get(i);
+			for( Map<String, Object> list : boardList) {
 			%>
 			<tr>
-				<td><%=board.getBoardId() %></td>
+				<td><%= list.get("BOARD_ID") %></td>
 				<%-- <td><a href="./board_detail.jsp?b_Id=<%=board.getBoardId() %>"><%=board.getBoardTitle() %></a></td> --%>
-				<td><a href="./board_detail.jsp?b_Id=<%= board.getBoardId() %>"><%=board.getBoardTitle() %></a></td>
-				<td><%=board.getBoardWriter() %></td>
-				<td><%=board.getBoardCreateDate() %></td>
-				<td><%=board.getBoardUpdateDate() %></td>
-				<td><%=board.getBoardHit() %></td>
+				<td><a href="./board_detail.jsp?b_Id=<%= list.get("BOARD_ID") %>"><%= list.get("BOARD_TITLE") %></a></td>
+				<td><%= list.get("BOARD_WRITER") %></td>
+				<td><%= sdf.format(list.get("BOARD_CREATE_DATE")) %></td>
+				<td><%= sdf.format(list.get("BOARD_UPDATE_DATE")) %></td>
+				<td><%= list.get("BOARD_HIT") %></td>
 			
 			</tr>
 			<%
@@ -145,5 +148,6 @@ PagingUtil paging = new PagingUtil( count, 6 );
   			</ul>
 	</div>
 </div>
+<%@ include file="/include/footer.jsp" %>
 </body>
 </html>

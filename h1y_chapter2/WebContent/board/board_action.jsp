@@ -1,38 +1,38 @@
+<%@page import="dao.BoardMybatisDAO"%>
 <%@page import="util.BoardValidationCheck"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="util.MyUtil"%>
-<%@page import="dto.BoardDTO"%>
-<%@page import="dao.BoardDAO"%>
 <!DOCTYPE html>
 <%
 request.setCharacterEncoding("utf-8");
 
 String session_param = (String)session.getAttribute("key") == null ? "" : (String)session.getAttribute("key");
 
-int boardId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0);
 String iud = MyUtil.NullPointerExUtil(request.getParameter("IUD"), "");
 
-BoardDAO boardDAO = new BoardDAO();
-BoardDTO boardDTO = new BoardDTO();
+Map<String, Object> boardMap = new HashMap<String, Object>();
+Map<String, Object> result = new HashMap<String, Object>();
 
-boardDTO.setBoardWriter(MyUtil.NullPointerExUtil(request.getParameter("writer"), ""));
-boardDTO.setBoardTitle(MyUtil.NullPointerExUtil(request.getParameter("title"), ""));
-boardDTO.setBoardContent(MyUtil.NullPointerExUtil(request.getParameter("content"), ""));
-boardDTO.setBoardId(boardId);
+boardMap.put("boardId", MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0));
+boardMap.put("writer", MyUtil.NullPointerExUtil(request.getParameter("writer"), ""));
+boardMap.put("title", MyUtil.NullPointerExUtil(request.getParameter("title"), ""));
+boardMap.put("content", MyUtil.NullPointerExUtil(request.getParameter("content"), ""));
+
+BoardMybatisDAO boardDao = new BoardMybatisDAO();
 
 // 게시물 등록시
 if ( iud.equals("I") ) {
 	
-	Map<String,Object> result = BoardValidationCheck.boardValidation(boardDTO, iud);
+	result = BoardValidationCheck.boardValidation(boardMap, iud);
 	
 	if ( !(boolean)result.get("success") ) {
 		out.println(MyUtil.alertAndLocationUtil(result.get("message").toString(), "./board_list.jsp" + session_param));
 		return;
 	}
 	
-	int insertNum = boardDAO.getBoardCreate(boardDTO);
+	int insertNum = boardDao.getBoardCreate(boardMap);
 	out.println(MyUtil.alertAndLocationUtil("게시글이 등록되었습니다 :)", "./board_detail.jsp" + (session_param.equals("") ? "?b_Id=" + insertNum : session_param + "&b_Id=" + insertNum)));
 	
 } 
@@ -40,14 +40,14 @@ if ( iud.equals("I") ) {
 // 게시물 수정시
 else if ( iud.equals("U") ) {
 	
-	Map<String,Object> result = BoardValidationCheck.boardValidation(boardDTO, iud);
+	result = BoardValidationCheck.boardValidation(boardMap, iud);
 	
 	if ( !(boolean)result.get("success") ) {
 		out.println(MyUtil.alertAndLocationUtil(result.get("message").toString(), "./board_list.jsp" + session_param));
 		return;
 	}
 	
-	boardDAO.getBoardUpdate(boardDTO);
+	boardDao.getBoardUpdate(boardMap);
 	out.println(MyUtil.alertAndLocationUtil("게시글이 수정되었습니다 :)", "./board_list.jsp" + session_param));
 	
 } 
@@ -55,14 +55,14 @@ else if ( iud.equals("U") ) {
 // 게시물 삭제시
 else if ( iud.equals("D") ) {
 	
-	Map<String,Object> result = BoardValidationCheck.boardValidation(boardDTO, iud);
+	result = BoardValidationCheck.boardValidation(boardMap, iud);
 	
 	if ( !(boolean)result.get("success") ) {
 		out.println(MyUtil.alertAndLocationUtil(result.get("message").toString(), "./board_list.jsp" + session_param));
 		return;
 	}
 	
-	boardDAO.getBoardDelete(boardId);
+	boardDao.getBoardDelete(boardMap);
 	
 	out.println(MyUtil.alertAndLocationUtil("게시글이 삭제되었습니다 :)", "./board_list.jsp" + session_param));
 	

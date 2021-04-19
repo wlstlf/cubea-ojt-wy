@@ -13,7 +13,11 @@ public class MyUtil {
 		
 		sb.append("<script type=\"text/javascript\"> \n");
 		
-		sb.append("alert('" + alertMessage + "'); \n");
+		if ( !alertMessage.equals("") ) {
+			
+			sb.append("alert('" + alertMessage + "'); \n");
+			
+		}
 		
 		sb.append("location.href='" + locationUrl + "';");
 		
@@ -59,7 +63,7 @@ public class MyUtil {
 		} catch (NumberFormatException e) {
 			
 			parseInt = defaultNum;
-			System.out.println("NumberFormatExUtil Catch !!!");
+			System.out.println("NumberFormatExUtil Catch !!! Convert to Default!!!");
 			
 		}
 		

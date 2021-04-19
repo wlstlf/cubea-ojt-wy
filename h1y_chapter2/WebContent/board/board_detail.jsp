@@ -1,18 +1,26 @@
+<%@page import="java.util.HashMap"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.Map"%>
+<%@page import="dao.BoardMybatisDAO"%>
 <%@page import="util.MyUtil"%>
-<%@page import="dto.BoardDTO"%>
-<%@page import="dao.BoardDAO"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%@ include file="/include/login_Check.jsp" %>
 <%
 request.setCharacterEncoding("utf-8");
-int boardId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0); //Integer.parseInt(request.getParameter("b_Id"));
-
-if ( boardId == 0 ) out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
-
-BoardDAO boardDAO = new BoardDAO();
-
+SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd ( hh:mm )");
+BoardMybatisDAO boardDao = new BoardMybatisDAO();
 String session_param = (String)session.getAttribute("key");
+
+//int boardId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0); //Integer.parseInt(request.getParameter("b_Id"));
+
+//String loginId = (String)session.getAttribute("login_Id");
+
+Map<String, Object> boardMap = new HashMap<String, Object>();
+boardMap.put("boardId", MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0));
+
+int boardId = Integer.parseInt(String.valueOf(boardMap.get("boardId")));
+if ( boardId == 0 ) out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
 
 //조회수 새로고침 중복 방지를 위한 쿠키 생성
 Cookie[] cookies = request.getCookies();
@@ -21,7 +29,7 @@ boolean hit = true;
 for ( Cookie cookie : cookies ) {
 	
 	// hit <- 쿠키가 존재하면 boolean hit false
-	if ( cookie.getName().equals("hit") ) {
+	if ( cookie.getName().equals(loginId + "_hit") ) {
 				
 		hit = false;
 		// 해당 번호의 게시글 조회수 증가 기록이 있다면
@@ -32,7 +40,7 @@ for ( Cookie cookie : cookies ) {
 		else {		
 			cookie.setValue(cookie.getValue() + "_" + request.getParameter("b_Id"));
 			response.addCookie(cookie);
-			boardDAO.getUpHit(boardId);
+			boardDao.getUpHit(boardMap);
 		}
 				
 	}
@@ -40,14 +48,15 @@ for ( Cookie cookie : cookies ) {
 }
 // 생성된 쿠키가 없으면 쿠키생성후 조회수 증가 로직수행 
 if( hit ) {
-	Cookie cookie1 = new Cookie("hit", request.getParameter("b_Id"));
+	Cookie cookie1 = new Cookie(loginId + "_hit", request.getParameter("b_Id"));
 	response.addCookie(cookie1);
-	boardDAO.getUpHit(boardId);
+	boardDao.getUpHit(boardMap);
 }
 
 // 페이지에 조회수 반영을 위해 맨 아래로
-BoardDTO boardDetail = boardDAO.getBoardDetail(boardId);
-String boardContentNewLine = boardDetail.getBoardContent().replace("\r\n", "<br>");
+Map<String, Object> boardDetail = boardDao.getBoardDetail(boardMap);
+String boardContentNewLine = (String)boardDetail.get("BOARD_CONTENT");
+boardContentNewLine = boardContentNewLine.replace("\r\n", "<br>");
 %>
 <html>
 <head>
@@ -59,7 +68,6 @@ String boardContentNewLine = boardDetail.getBoardContent().replace("\r\n", "<br>
 <title>Insert title here</title>
 </head>
 <body>
-
 <%@ include file="/include/nav.jsp" %>
 <div class="container">	
 	<div style="margin: 100px 0 50px 0;">
@@ -75,15 +83,15 @@ String boardContentNewLine = boardDetail.getBoardContent().replace("\r\n", "<br>
 	        <tbody>
 	        	<tr>
 	                <th>글번호</th>
-	                <td><%= boardDetail.getBoardId() %></td>
+	                <td><%= boardDetail.get("BOARD_ID") %></td>
 	            </tr>
 	            <tr>
 	                <th>작성자</th>
-	                <td><%= boardDetail.getBoardWriter() %></td>
+	                <td><%= boardDetail.get("BOARD_WRITER") %></td>
 	            </tr>
 	            <tr>
 	                <th>제목</th>
-	                <td><%= boardDetail.getBoardTitle() %></td>
+	                <td><%= boardDetail.get("BOARD_TITLE") %></td>
 	            </tr>
 	            <tr>
 	                <th>내용</th>
@@ -91,23 +99,31 @@ String boardContentNewLine = boardDetail.getBoardContent().replace("\r\n", "<br>
 	            </tr>
 	            <tr>
 	                <th>등록일</th>
-	                <td><%= boardDetail.getBoardCreateDate() %></td>
+	                <td><%= sdf.format(boardDetail.get("BOARD_CREATE_DATE")) %></td>
 	            </tr>
 	            <tr>
 	                <th>수정일</th>
-	                <td><%= boardDetail.getBoardUpdateDate() %></td>
+	                <td><%= sdf.format(boardDetail.get("BOARD_UPDATE_DATE")) %></td>
 	            </tr>
 	            <tr>
 	                <th>조회수</th>
-	                <td><%= boardDetail.getBoardHit() %></td>
+	                <td><%= boardDetail.get("BOARD_HIT") %></td>
 	            </tr>
 	        </tbody>
 	    </table>
 	    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 		    <!-- <a href="./board_list.jsp" class="btn btn-outline-dark">목록</a> -->
 		    <a href="./board_list.jsp<%=session_param %>" class="btn btn-outline-dark">목록</a>
+		<% if ( loginId.equals(boardDetail.get("BOARD_WRITER")) || loginAuth.equals("admin") ) { %>
 		    <a href="./board_modify.jsp?b_Id=<%= boardId %>&IUD=U" class="btn btn-outline-success">수정</a>
+		<%
+	 	}
+		%>
+		<% if ( loginId.equals(boardDetail.get("BOARD_WRITER")) || loginAuth.equals("admin") ) { %>
 		    <a href="./board_action.jsp?b_Id=<%= boardId %>&IUD=D" class="btn btn-outline-danger">삭제</a>
+		<%
+	 	}
+		%>
 		</div>
 	</div>
 	
@@ -143,7 +159,7 @@ String boardContentNewLine = boardDetail.getBoardContent().replace("\r\n", "<br>
 	    </form>
 	</div>
 </div>
-
+<%@ include file="/include/footer.jsp" %>
 
 </body>
 </html>
