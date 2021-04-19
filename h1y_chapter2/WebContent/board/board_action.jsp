@@ -4,6 +4,7 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="util.MyUtil"%>
+<%@ include file="/include/login_Check.jsp" %>
 <!DOCTYPE html>
 <%
 request.setCharacterEncoding("utf-8");
@@ -19,6 +20,8 @@ boardMap.put("boardId", MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 
 boardMap.put("writer", MyUtil.NullPointerExUtil(request.getParameter("writer"), ""));
 boardMap.put("title", MyUtil.NullPointerExUtil(request.getParameter("title"), ""));
 boardMap.put("content", MyUtil.NullPointerExUtil(request.getParameter("content"), ""));
+
+int bId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0);
 
 BoardMybatisDAO boardDao = new BoardMybatisDAO();
 
@@ -62,13 +65,26 @@ else if ( iud.equals("D") ) {
 		return;
 	}
 	
-	boardDao.getBoardDelete(boardMap);
+	String bWriter = "";
+	boardMap = boardDao.getBoardDetail(bId);
 	
-	out.println(MyUtil.alertAndLocationUtil("게시글이 삭제되었습니다 :)", "./board_list.jsp" + session_param));
+	if( boardMap != null ) {
+		
+		bWriter = (String)boardMap.get("BOARD_WRITER");
+		System.out.println("bWriter === " + bWriter);
+		if( loginId.equals(bWriter) ) {
+			
+			int deleteCol = 1;//boardDao.getBoardDelete(boardMap);
+			
+			if ( deleteCol == 1 ) out.println(MyUtil.alertAndLocationUtil("게시글이 삭제되었습니다 :)", "./board_list.jsp" + session_param));
+			
+		} 
+		
+	} else out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp" + session_param));
 	
 }
 
-else if ( !iud.equals("I") || !iud.equals("U") || !iud.equals("D") ) {
+else if ( !iud.equals("I") && !iud.equals("U") && !iud.equals("D") ) {
 	
 	out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp" + session_param));
 	

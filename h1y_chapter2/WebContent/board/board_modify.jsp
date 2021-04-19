@@ -5,6 +5,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%@ include file="/include/login_Check.jsp" %>
 <%
 request.setCharacterEncoding("utf-8");
 String iud = MyUtil.NullPointerExUtil(request.getParameter("IUD"), "");
@@ -12,13 +13,37 @@ String iud = MyUtil.NullPointerExUtil(request.getParameter("IUD"), "");
 BoardMybatisDAO boardDao = new BoardMybatisDAO();
 Map<String, Object> boardDetail = new HashMap<String, Object>();
 
-boardDetail.put("boardId", MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0));
+int bId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0);
+String bTitle = "";
+String bContent = "";
+String bWriter = "";
 
 if ( iud.equals("U") ) {
 	
-	if ( boardDetail.get("boardId").equals("0") ) out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
+	boardDetail = boardDao.getBoardDetail(bId);
 	
-	boardDetail = boardDao.getBoardDetail(boardDetail);
+	if ( boardDetail != null ) {
+		
+		bId = Integer.parseInt(String.valueOf(boardDetail.get("BOARD_ID")));
+		bTitle = (String)boardDetail.get("BOARD_TITLE");
+		bContent = (String)boardDetail.get("BOARD_CONTENT");
+		bWriter = (String)boardDetail.get("BOARD_WRITER");
+		
+		if ( !loginId.equals(bWriter) ) {
+			
+			out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
+			
+		}
+			
+	} else {
+		
+		out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
+		
+	}
+	
+} else if ( !iud.equals("U") && !iud.equals("I") ) {
+	
+	out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
 	
 }
 %>
@@ -34,7 +59,6 @@ if ( iud.equals("U") ) {
 <body>
 <script type="text/javascript" src="../resources/js/board/board.js"></script>
 <%@ include file="/include/nav.jsp" %>
-<%@ include file="/include/login_Check.jsp" %>
 <div class="container">
 	<div style="margin: 100px 0 50px 0;">
 		<h2 style="text-align: center;"><%= iud.equals("I") ? "글 작성" : "글 수정" %></h2>
@@ -42,20 +66,20 @@ if ( iud.equals("U") ) {
     <form action="./board_action.jsp" id="modifyForm" method="post">
       <div class="form-group">
         <label for="subject">제목</label>
-        <input type="text" class="form-control" id="title" name="title" placeholder="제목을 입력하세요." value="<%= boardDetail.get("BOARD_TITLE") == null ? "":boardDetail.get("BOARD_TITLE") %>">
+        <input type="text" class="form-control" id="title" name="title" placeholder="제목을 입력하세요." value="<%= bTitle %>">
       </div>
       <div class="form-group">
         <label for="writer">작성자</label>
-        <input type="text" class="form-control" id="writer" name="writer" placeholder="작성자를 입력하세요." value="<%= boardDetail.get("BOARD_WRITER") == null ? loginId : boardDetail.get("BOARD_WRITER") %>">
+        <input type="text" class="form-control" id="writer" name="writer" placeholder="작성자를 입력하세요." value="<%= bWriter.equals("") ? loginId : bWriter %>">
       </div>
       <div class="form-group">
         <label for="content">내용</label>
-        <textarea class="form-control" id="content" name="content" rows="3" placeholder="내용을 입력하세요."><%= boardDetail.get("BOARD_CONTENT") == null ? "":boardDetail.get("BOARD_CONTENT") %></textarea>
+        <textarea class="form-control" id="content" name="content" rows="3" placeholder="내용을 입력하세요."><%= bContent %></textarea>
       </div>
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       	<button type="submit" class="btn btn-primary">등록</button>
       </div>
-      	<input type="hidden" name="b_Id" id="b_Id" value="<%= boardDetail.get("BOARD_ID") %>">
+      	<input type="hidden" name="b_Id" id="b_Id" value="<%= bId %>">
       	<input type="hidden" name="IUD" id="IUD" value="<%= iud %>">
       	<input type="hidden" name="param" id="param" value=""/>
     </form>

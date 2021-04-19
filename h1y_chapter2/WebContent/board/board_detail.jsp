@@ -12,15 +12,13 @@ SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd ( hh:mm )");
 BoardMybatisDAO boardDao = new BoardMybatisDAO();
 String session_param = (String)session.getAttribute("key");
 
-//int boardId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0); //Integer.parseInt(request.getParameter("b_Id"));
-
-//String loginId = (String)session.getAttribute("login_Id");
-
-Map<String, Object> boardMap = new HashMap<String, Object>();
-boardMap.put("boardId", MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0));
-
-int boardId = Integer.parseInt(String.valueOf(boardMap.get("boardId")));
-if ( boardId == 0 ) out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
+int bId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0);
+String bTitle = "";
+String bContent = "";
+String bWriter = "";
+String bCDate = "";
+String bUDate = "";
+int bHit = 0;
 
 //조회수 새로고침 중복 방지를 위한 쿠키 생성
 Cookie[] cookies = request.getCookies();
@@ -34,13 +32,13 @@ for ( Cookie cookie : cookies ) {
 		hit = false;
 		// 해당 번호의 게시글 조회수 증가 기록이 있다면
 		if ( cookie.getValue().contains( MyUtil.NullPointerExUtil(request.getParameter("b_Id"), "")) ) {
-			System.out.println(boardId + " 게시글 조회수 증가 쿠키 존재");
+			System.out.println(bId + " 게시글 조회수 증가 쿠키 존재");
 		} 
 		// hit쿠키에 boardId 번호가 존재하지 않다면 조회수 증가 로직수행
 		else {		
 			cookie.setValue(cookie.getValue() + "_" + request.getParameter("b_Id"));
 			response.addCookie(cookie);
-			boardDao.getUpHit(boardMap);
+			boardDao.getUpHit(bId);
 		}
 				
 	}
@@ -50,13 +48,28 @@ for ( Cookie cookie : cookies ) {
 if( hit ) {
 	Cookie cookie1 = new Cookie(loginId + "_hit", request.getParameter("b_Id"));
 	response.addCookie(cookie1);
-	boardDao.getUpHit(boardMap);
+	boardDao.getUpHit(bId);
 }
 
+Map<String, Object> boardDetail = boardDao.getBoardDetail(bId);
+
 // 페이지에 조회수 반영을 위해 맨 아래로
-Map<String, Object> boardDetail = boardDao.getBoardDetail(boardMap);
-String boardContentNewLine = (String)boardDetail.get("BOARD_CONTENT");
-boardContentNewLine = boardContentNewLine.replace("\r\n", "<br>");
+if ( boardDetail != null ) {
+	
+	bId = Integer.parseInt(String.valueOf(boardDetail.get("BOARD_ID")));
+	bTitle = (String)boardDetail.get("BOARD_TITLE");
+	bContent = (String)boardDetail.get("BOARD_CONTENT");
+	bContent = bContent.replace("\r\n", "<br>");
+	bWriter = (String)boardDetail.get("BOARD_WRITER");
+	bCDate = sdf.format(boardDetail.get("BOARD_CREATE_DATE"));
+	bUDate = sdf.format(boardDetail.get("BOARD_UPDATE_DATE"));
+	bHit = Integer.parseInt(String.valueOf(boardDetail.get("BOARD_HIT")));
+	
+} else {
+	
+	out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
+	
+}
 %>
 <html>
 <head>
@@ -83,46 +96,49 @@ boardContentNewLine = boardContentNewLine.replace("\r\n", "<br>");
 	        <tbody>
 	        	<tr>
 	                <th>글번호</th>
-	                <td><%= boardDetail.get("BOARD_ID") %></td>
+	                <td><%= bId %></td>
 	            </tr>
 	            <tr>
 	                <th>작성자</th>
-	                <td><%= boardDetail.get("BOARD_WRITER") %></td>
+	                <td><%= bTitle %></td>
 	            </tr>
 	            <tr>
 	                <th>제목</th>
-	                <td><%= boardDetail.get("BOARD_TITLE") %></td>
+	                <td><%= bWriter %></td>
 	            </tr>
 	            <tr>
 	                <th>내용</th>
-	                <td><%= boardContentNewLine %></td>
+	                <td><%= bContent %></td>
 	            </tr>
 	            <tr>
 	                <th>등록일</th>
-	                <td><%= sdf.format(boardDetail.get("BOARD_CREATE_DATE")) %></td>
+	                <td><%= bCDate %></td>
 	            </tr>
 	            <tr>
 	                <th>수정일</th>
-	                <td><%= sdf.format(boardDetail.get("BOARD_UPDATE_DATE")) %></td>
+	                <td><%= bUDate %></td>
 	            </tr>
 	            <tr>
 	                <th>조회수</th>
-	                <td><%= boardDetail.get("BOARD_HIT") %></td>
+	                <td><%= bHit %></td>
 	            </tr>
 	        </tbody>
 	    </table>
 	    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 		    <!-- <a href="./board_list.jsp" class="btn btn-outline-dark">목록</a> -->
 		    <a href="./board_list.jsp<%=session_param %>" class="btn btn-outline-dark">목록</a>
-		<% if ( loginId.equals(boardDetail.get("BOARD_WRITER")) || loginAuth.equals("admin") ) { %>
-		    <a href="./board_modify.jsp?b_Id=<%= boardId %>&IUD=U" class="btn btn-outline-success">수정</a>
+		<% 
+		if( loginId != null && loginAuth != null ) {
+			if ( loginId.equals(bWriter) || loginAuth.equals("admin") ) { %>
+		    <a href="./board_modify.jsp?b_Id=<%= bId %>&IUD=U" class="btn btn-outline-success">수정</a>
 		<%
-	 	}
+	 		}
 		%>
-		<% if ( loginId.equals(boardDetail.get("BOARD_WRITER")) || loginAuth.equals("admin") ) { %>
-		    <a href="./board_action.jsp?b_Id=<%= boardId %>&IUD=D" class="btn btn-outline-danger">삭제</a>
+		<% if ( loginId.equals(bWriter) || loginAuth.equals("admin") ) { %>
+		    <a href="./board_action.jsp?b_Id=<%= bId %>&IUD=D" class="btn btn-outline-danger">삭제</a>
 		<%
-	 	}
+	 		}
+		}
 		%>
 		</div>
 	</div>

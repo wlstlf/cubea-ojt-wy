@@ -6,6 +6,7 @@
 <%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ include file="/include/login_Check.jsp" %>
 <!DOCTYPE html>
 <%
 request.setCharacterEncoding("utf-8");
@@ -37,7 +38,6 @@ PagingUtil paging = new PagingUtil( count, 6 );
 </head>
 <body>
 <%@ include file="/include/nav.jsp" %>
-<%@ include file="/include/login_Check.jsp" %>
 <div class="container">
 	<div style="margin: 100px 0 50px 0;">
 		<h2 style="text-align: center;">게시판 리스트</h2>

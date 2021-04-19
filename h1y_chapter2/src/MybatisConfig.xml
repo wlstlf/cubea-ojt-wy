@@ -29,7 +29,7 @@
 	            <!-- poolPingEnabled : 커넥션이 살아있는지 ping 테스트 여부 -->
 	            <property name="poolPingEnabled" value="true"/>
 	            <!-- poolPingQuery : 커넥션 ping 테스트 쿼리 (DB 종류에 따라 적절하게 수정) -->
-	            <property name="poolPingQuery" value="select 1"/>
+	            <!-- <property name="poolPingQuery" value="select 1"/> -->
 	            <!-- poolPingConnectionsNotUsedFor : 유휴상태의 커넥션이 닫히는지 판단할 시간(ms) -->
 	            <property name="poolPingConnectionsNotUsedFor" value="10000"/>
 	            <!-- poolTimeToWait : 사용된 커넥션을 기다리는 시간 -->

@@ -50,9 +50,17 @@ public class BoardMybatisDAO {
 		
 	}
 	
-	public Map<String, Object> getBoardDetail(Map<String, Object> boardMap) {
+	public int getMaxBoardId() {
 		
-		Map<String, Object> result = sqlSession.selectOne("getBoardDetail", boardMap);
+		int maxId = sqlSession.selectOne("getMaxBoardId");
+		
+		return maxId;
+		
+	}
+	
+	public Map<String, Object> getBoardDetail(int boardId) {
+		
+		Map<String, Object> result = sqlSession.selectOne("getBoardDetail", boardId);
 		
 		return result;
 		
@@ -75,15 +83,17 @@ public class BoardMybatisDAO {
 		
 	}
 	
-	public void getBoardDelete(Map<String, Object> boardMap) {
+	public int getBoardDelete(Map<String, Object> boardMap) {
 		
-		sqlSession.delete("getBoardDelete", boardMap);
+		int deleteCol = sqlSession.delete("getBoardDelete", boardMap);
+		
+		return deleteCol;
 		
 	}
 	
-	public void getUpHit(Map<String, Object> boardMap) {
+	public void getUpHit(int boardId) {
 		
-		sqlSession.update("getUpHit", boardMap);
+		sqlSession.update("getUpHit", boardId);
 		
 	}
 	

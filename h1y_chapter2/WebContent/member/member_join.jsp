@@ -1,6 +1,17 @@
+<%@page import="util.MyUtil"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%
+String loginId = (String)session.getAttribute("login_Id");
+String loginAuth = (String)session.getAttribute("login_auth");
+
+if( loginId != null ) {
+	
+	out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "../board/board_list.jsp"));
+	
+}
+%>
 <html>
 <head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
