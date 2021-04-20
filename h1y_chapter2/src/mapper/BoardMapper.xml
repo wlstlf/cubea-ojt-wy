@@ -30,7 +30,11 @@
 		ORDER BY BOARD_ID DESC ) A ) WHERE RN <![CDATA[>=]]> #{startRow} AND RN <![CDATA[<=]]> #{endRow}
 	</select>
 	
-	<select id="getBoardDetail" parameterType="map" resultType="map">
+	<select id="getMaxBoardId" resultType="int">
+		SELECT MAX(BOARD_ID) FROM BOARD
+	</select>
+	
+	<select id="getBoardDetail" parameterType="int" resultType="map">
 		SELECT * FROM BOARD WHERE BOARD_ID = #{boardId}
 	</select>
 	
@@ -46,7 +50,7 @@
 		DELETE FROM BOARD WHERE BOARD_ID = #{boardId}
 	</delete>
 	
-	<update id="getUpHit" parameterType="map">
+	<update id="getUpHit" parameterType="int">
 		UPDATE BOARD SET BOARD_HIT = NVL(BOARD_HIT,0) + 1 WHERE BOARD_ID = #{boardId}
 	</update>
 	
