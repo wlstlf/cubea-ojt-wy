@@ -1,12 +1,27 @@
+function idCheck(id){
+	
+	var idReg = /^[a-z0-9]{5,20}$/;
+	var check = true;
+	
+	if ( !idReg.test(id) ) {
+		
+		check = false;
+		return check;
+	}
+	
+	return check;
+	
+};
+
+
 $(document).ready(function(){
 	
-	$("#userId").blur(function(){
+	$("#idCheckButton").click(function(){
 		
 		var userId = $("#userId").val();
+		var id = idCheck(userId);
 		
-		var idReg = /^[a-z0-9]{5,20}$/;
-		
-		if ( userId != '' ){
+		if ( userId != '' && id == true ){
 		
 			$.ajax({
 				
@@ -25,20 +40,10 @@ $(document).ready(function(){
 						
 					} else {
 						
-						if ( !idReg.test(userId) ) {
-							
-							$(".idCheckBold").text("ID는 5~20자의 영문 소문자, 숫자만 사용 가능합니다 :(");
-							$("#userId").css("border-color","#DC3545");
-							$(".idCheck").css("color","#DC3545");
-							$("#joinButton").attr("disabled", true);
-							
-							return false;
-							
-						}
-						
 						$(".idCheckBold").text("\"" + userId + "\" 는 사용가능한 ID 입니다 :)");
 						$("#userId").css("border-color","#198754");
 						$(".idCheck").css("color","#198754");
+						$("#idCheckYN").val('Y');
 						$("#joinButton").attr("disabled", false);
 						
 					}
@@ -48,6 +53,15 @@ $(document).ready(function(){
 		          }
 				
 			});
+		} else {
+			
+			$(".idCheckBold").text("ID는 5~20자의 영문 소문자, 숫자만 사용 가능합니다 :(");
+			$("#userId").css("border-color","#DC3545");
+			$(".idCheck").css("color","#DC3545");
+			$("#joinButton").attr("disabled", true);
+			
+			return false;
+			
 		}
 	});
 	
@@ -76,10 +90,20 @@ $(document).ready(function(){
 function memberFormSubmit(){
 	
 	var passReg = /^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\(\\)\-_=+]).{8,16}$/;
+	var userId = $("#userId").val();
+	var id = idCheck(userId);
 	
-	if ( $("#userId").val() == '' ) {
+	if ( $("#idCheckYN").val() == 'N' ) {
 		
-		alert("아이디를 입력해주세요!");
+		alert("ID 중복체크를 해주세요 :(");
+		$("#userId").focus();
+		return false;
+		
+	}
+	
+	if ( userId == '' || id == false ) {
+		
+		alert("ID는 5~20자의 영문 소문자, 숫자만 사용 가능합니다 :(");
 		$("#userId").focus();
 		return false;
 		

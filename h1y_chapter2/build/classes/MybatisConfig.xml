@@ -21,7 +21,7 @@
 				<property name="username" value="${username}"/>
 				<property name="password" value="${password}"/>
 				<!-- poolMaximumActiveConnections : 활성화된 최대 커넥션 수 -->
-				<property name="poolMaximumActiveConnections" value="20"/>
+				<property name="poolMaximumActiveConnections" value="100"/>
 				<!-- poolMaximumIdleConnections : 유휴상태에서 최대 커넥션 수 -->
 	            <property name="poolMaximumIdleConnections" value="20"/>
 	            <!-- poolMaximumCheckoutTime : 최대 커넥션 획득 시간(ms) -->
@@ -29,7 +29,8 @@
 	            <!-- poolPingEnabled : 커넥션이 살아있는지 ping 테스트 여부 -->
 	            <property name="poolPingEnabled" value="true"/>
 	            <!-- poolPingQuery : 커넥션 ping 테스트 쿼리 (DB 종류에 따라 적절하게 수정) -->
-	            <!-- <property name="poolPingQuery" value="select 1"/> -->
+	            <!-- ex) MYSQL : SELECT 1   ORACLE : SELECT 1 FROM DUAL -->
+	            <property name="poolPingQuery" value="select 1 from dual"/>
 	            <!-- poolPingConnectionsNotUsedFor : 유휴상태의 커넥션이 닫히는지 판단할 시간(ms) -->
 	            <property name="poolPingConnectionsNotUsedFor" value="10000"/>
 	            <!-- poolTimeToWait : 사용된 커넥션을 기다리는 시간 -->

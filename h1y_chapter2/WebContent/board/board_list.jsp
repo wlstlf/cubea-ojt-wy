@@ -1,6 +1,7 @@
+<%@page import="java.util.HashMap"%>
+<%@page import="dao.CommonDAO"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Map"%>
-<%@page import="dao.BoardMybatisDAO"%>
 <%@page import="util.PagingUtil"%>
 <%@page import="util.MyUtil"%>
 <%@page import="java.util.List"%>
@@ -16,14 +17,28 @@ SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 String session_param = MyUtil.urlParameterUtil(request);
 session.setAttribute("key", session_param);
 
-BoardMybatisDAO boardDao = new BoardMybatisDAO();
-
 String category = MyUtil.NullPointerExUtil(request.getParameter("category"), "");
 String text = MyUtil.NullPointerExUtil(request.getParameter("text"), "");
 int pageNum = MyUtil.NumberFormatExUtil(request.getParameter("pageNum"), 1);
+int limit = 6;
+int startRow = ( pageNum - 1 ) * 6 + 1;
+int endRow = startRow + limit -1;
+int count = 0;
 
-int count = boardDao.getBoardListCount(category, text);
-List<Map<String, Object>> boardList = boardDao.getBoardList(pageNum, category, text);
+CommonDAO commonDao = new CommonDAO();
+
+Map<String, Object> map = new HashMap<String, Object>();
+
+map.put("category", category);
+map.put("text", text);
+map.put("pageNum", pageNum);
+map.put("startRow", startRow);
+map.put("endRow", endRow);
+
+Map<String,Object> countMap = commonDao.selectOne("getBoardListCount", map);
+List<Map<String, Object>> boardList = commonDao.selectList("getBoardList", map);
+
+count = Integer.parseInt(String.valueOf(countMap.get("COUNT")));
 
 PagingUtil paging = new PagingUtil( count, 6 );
 %>
@@ -67,7 +82,8 @@ PagingUtil paging = new PagingUtil( count, 6 );
 		</thead>
 		<tbody>
 			<% 
-			for( Map<String, Object> list : boardList) {
+			if( boardList != null ) {
+				for( Map<String, Object> list : boardList) {
 			%>
 			<tr>
 				<td><%= list.get("BOARD_ID") %></td>
@@ -80,6 +96,13 @@ PagingUtil paging = new PagingUtil( count, 6 );
 			
 			</tr>
 			<%
+				}
+			} else {
+			%>	
+				<tr>
+					<td colspan="6" style="text-align: center;">등록된 게시글이 없습니다.</td>
+				</tr>
+			<%	
 			}
 			%>
 		</tbody>
@@ -91,14 +114,14 @@ PagingUtil paging = new PagingUtil( count, 6 );
 	<div class="search row">
 		<div class="col-xs-2 col-sm-2">
 			<select class="form-control" name="category">
-				<option value="T">제목</option>
-				<option value="C">내용</option>
-				<option value="A">제목 + 내용</option>
+				<option value="T" <%= category.equals("T") ? "selected" : "" %>>제목</option>
+				<option value="C" <%= category.equals("C") ? "selected" : "" %>>내용</option>
+				<option value="A" <%= category.equals("A") ? "selected" : "" %>>제목 + 내용</option>
 			</select>
 		</div>
 		<div class="col-xs-10 col-sm-10">
 			<div class="input-group">
-				<input type="text" class="form-control" name="text"/>
+				<input type="text" class="form-control" name="text" value="<%= text %>"/>
 				<span class="input-group-btn">
 					<button type="submit" class="btn btn-primary">검색</button>
 				</span>

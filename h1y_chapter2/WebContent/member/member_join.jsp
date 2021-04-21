@@ -29,7 +29,7 @@ if( loginId != null ) {
     <div class="py-5 text-center">
         <h2>회원가입</h2>
     </div>
-	<form class="needs-validation" id="memberForm">
+	<form class="needs-validation" id="memberForm" method="post">
     	<h4 class="mb-3">회원 권한</h4>
         <hr class="mb-4">
       	<div class="row">
@@ -56,6 +56,8 @@ if( loginId != null ) {
                   <div class="idCheck" style="width: 100%; margin-top: 10px; font-size: 15px;">
                   	<b class="idCheckBold"></b>
                   </div>
+                  <button class="btn btn-success btn-lg btn-block" id="idCheckButton" type="button" style="margin-top: 10px;">아이디 중복체크</button>
+                  <input type="hidden" id="idCheckYN" value="N">
               </div>
           </div>
           <div class="mb-3">

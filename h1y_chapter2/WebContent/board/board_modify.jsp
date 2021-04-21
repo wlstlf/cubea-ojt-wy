@@ -1,16 +1,15 @@
+<%@page import="dao.CommonDAO"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="dao.BoardMybatisDAO"%>
 <%@page import="util.MyUtil"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <%@ include file="/include/login_Check.jsp" %>
 <%
 request.setCharacterEncoding("utf-8");
 String iud = MyUtil.NullPointerExUtil(request.getParameter("IUD"), "");
 
-BoardMybatisDAO boardDao = new BoardMybatisDAO();
+CommonDAO commonDao = new CommonDAO();
 Map<String, Object> boardDetail = new HashMap<String, Object>();
 
 int bId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0);
@@ -18,9 +17,11 @@ String bTitle = "";
 String bContent = "";
 String bWriter = "";
 
+boardDetail.put("boardId", bId);
+
 if ( iud.equals("U") ) {
 	
-	boardDetail = boardDao.getBoardDetail(bId);
+	boardDetail = commonDao.selectOne("getBoardDetail", boardDetail);
 	
 	if ( boardDetail != null ) {
 		
@@ -29,7 +30,7 @@ if ( iud.equals("U") ) {
 		bContent = (String)boardDetail.get("BOARD_CONTENT");
 		bWriter = (String)boardDetail.get("BOARD_WRITER");
 		
-		if ( !loginId.equals(bWriter) ) {
+		if ( !loginId.equals(bWriter) && !loginAuth.equals("admin") ) {
 			
 			out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
 			
@@ -77,7 +78,7 @@ if ( iud.equals("U") ) {
         <textarea class="form-control" id="content" name="content" rows="3" placeholder="내용을 입력하세요."><%= bContent %></textarea>
       </div>
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      	<button type="submit" class="btn btn-primary">등록</button>
+      	<button type="button" onclick="modifySubmit();" class="btn btn-primary">등록</button>
       </div>
       	<input type="hidden" name="b_Id" id="b_Id" value="<%= bId %>">
       	<input type="hidden" name="IUD" id="IUD" value="<%= iud %>">

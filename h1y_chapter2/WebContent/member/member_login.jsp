@@ -1,7 +1,6 @@
 <%@page import="util.MyUtil"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.List"%>
-<%@page import="dao.BoardMybatisDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -28,7 +27,7 @@ if( loginId != null ) {
 <script type="text/javascript" src="../resources/js/member/member.js"></script>
 <%@ include file="/include/nav.jsp" %>
 <div class="container" style="margin-top: 110px;">
-	<form class="form-signin" id="loginForm">
+	<form class="form-signin" id="loginForm" method="post">
 		<div class="py-5 text-center">
 			<h2 class="form-signin-heading">LOG IN</h2>
 		</div>	
@@ -41,7 +40,7 @@ if( loginId != null ) {
 		<div class="mb-3">
     		<label for="username">비밀번호</label>
     			<div class="input-group">
-        			<input type="password" class="form-control" name="loginUserPass" id="loginUserPass" placeholder="User Password">
+        			<input type="password" class="form-control" name="loginUserPass" id="loginUserPass" placeholder="User Password" autocomplete="new-password">
       			</div>
   		</div>
   		<input type="hidden" name="IO" value="I">
