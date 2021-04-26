@@ -32,11 +32,11 @@
    	<%
    	if ( session.getAttribute("login_Id") != null ) {
    	%>
-    	<a class="navbar-brand" href="#">( <%= session.getAttribute("login_auth").equals("normal") ? "일반회원" : "관리자" %> ) <%= session.getAttribute("login_Id") %></a>
+    	<a class="navbar-brand" href="#">( <%= session.getAttribute("login_auth").equals("normal") ? "Normal" : "Admin" %> ) <%= session.getAttribute("login_Id") %></a>
    	<%
    	} else {
    	%>
-   		<a class="navbar-brand" href="#">Loing ID</a>
+   		<a class="navbar-brand" href="#">Login ID</a>
    	<%
    	}
    	%>

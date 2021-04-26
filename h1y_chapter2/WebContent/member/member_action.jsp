@@ -1,5 +1,5 @@
+<%@page import="dao.CommonDAO"%>
 <%@page import="util.MemberValidationCheck"%>
-<%@page import="dao.MemberMybatisDAO"%>
 <%@page import="util.SHA256Util"%>
 <%@page import="util.MyUtil"%>
 <%@page import="java.util.HashMap"%>
@@ -9,7 +9,7 @@
 <%
 request.setCharacterEncoding("utf-8");
 
-MemberMybatisDAO memberDao = new MemberMybatisDAO();
+CommonDAO commonDao = new CommonDAO();
 Map<String, Object> memberMap = new HashMap<String, Object>();
 Map<String, Object> result = new HashMap<String, Object>();
 
@@ -31,7 +31,18 @@ if ( !(boolean)result.get("success") ) {
 	
 } else if ( (boolean)result.get("success") ) {
 	
-	memberDao.getMemberCreate(memberMap);
+	memberMap = commonDao.selectOne("getIdOverCheck", memberMap);
+	
+	int idCheck = Integer.parseInt(String.valueOf(memberMap.get("COUNT")));  
+	
+	if ( idCheck != 0 ) {
+		
+		out.println(MyUtil.alertAndLocationUtil("아이디가 중복됩니다. 중복체크를 진행해주세요 :(", "./member_join.jsp"));
+		return;
+		
+	}
+	
+	commonDao.insert("getMemberCreate", memberMap);
 	out.println(MyUtil.alertAndLocationUtil("회원가입 되었습니다 :)", "./member_login.jsp"));
 	
 }

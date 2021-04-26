@@ -4,16 +4,47 @@
 <mapper namespace="MemberMapper">
 
 	<select id="getMemberLoginCheck" parameterType="map" resultType="map">
-		SELECT COUNT(*), MEMBER_AUTH FROM MEMBER WHERE MEMBER_ID = #{userId} AND MEMBER_PASSWORD = #{userPass} GROUP BY MEMBER_AUTH
+		SELECT 
+			COUNT(*),
+			MEMBER_AUTH 
+		FROM 
+			MEMBER 
+		WHERE 
+			MEMBER_ID = #{userId} 
+		AND 
+			MEMBER_PASSWORD = #{userPass} 
+		GROUP BY 
+			MEMBER_AUTH
 	</select>
 
-	<select id="getIdOverCheck" parameterType="map" resultType="int">
-		SELECT COUNT(*) FROM MEMBER WHERE MEMBER_ID = #{userId}
+	<select id="getIdOverCheck" parameterType="map" resultType="map">
+		SELECT 
+			COUNT(*) AS COUNT 
+		FROM 
+			MEMBER 
+		WHERE 
+			MEMBER_ID = #{userId}
 	</select>
 
 	<insert id="getMemberCreate" parameterType="map">
-		INSERT INTO MEMBER (MEMBER_SEQ, MEMBER_AUTH, MEMBER_ID, MEMBER_PASSWORD, MEMBER_NAME, MEMBER_EMAIL) 
-		VALUES (SEQ_MEMBER_SEQ.NEXTVAL, #{userAuth}, #{userId}, #{userPass}, #{userName}, #{userEmail})
+		INSERT 
+		INTO 
+			MEMBER (
+				MEMBER_SEQ, 
+				MEMBER_AUTH, 
+				MEMBER_ID, 
+				MEMBER_PASSWORD, 
+				MEMBER_NAME, 
+				MEMBER_EMAIL
+			) 
+			VALUES (
+				SEQ_MEMBER_SEQ.NEXTVAL, 
+				#{userAuth}, 
+				#{userId}, 
+				#{userPass}, 
+				#{userName}, 
+				#{userEmail}
+			)
 	</insert>
 	
 </mapper>

@@ -10,7 +10,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 // Mybatis를 이용하여 sql을 실행 시키는 객체를 생성하는 코드!
 public class SqlSessionManager {
 
-	public static SqlSessionFactory sqlSession;
+	private static SqlSessionFactory sqlSession;
 	
 	static {
 		
@@ -19,9 +19,13 @@ public class SqlSessionManager {
 		Reader reader;
 		
 		try {
-		
-			reader = Resources.getResourceAsReader(resource);
-			sqlSession = new SqlSessionFactoryBuilder().build(reader);
+			
+			if ( sqlSession == null ) {
+				
+				reader = Resources.getResourceAsReader(resource);
+				sqlSession = new SqlSessionFactoryBuilder().build(reader);
+				
+			}
 			
 		} catch (IOException e) {
 			

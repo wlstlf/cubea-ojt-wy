@@ -1,5 +1,5 @@
+<%@page import="dao.CommonDAO"%>
 <%@page import="util.MemberValidationCheck"%>
-<%@page import="dao.MemberMybatisDAO"%>
 <%@page import="util.MyUtil"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -7,7 +7,8 @@
 <%
 request.setCharacterEncoding("utf-8");
 
-MemberMybatisDAO memberDao = new MemberMybatisDAO();
+CommonDAO commonDao = new CommonDAO();
+
 Map<String, Object> loginMap = new HashMap<String, Object>();
 Map<String, Object> result = new HashMap<String, Object>();
 
@@ -27,7 +28,7 @@ if ( logType.equals("I") ) {
 		
 	} else if ( (boolean)result.get("success") ) {
 		
-		Map<String, Object> map = memberDao.getMemberLoginCheck(loginMap);
+		Map<String, Object> map = commonDao.selectOne("getMemberLoginCheck",loginMap);
 
 		if ( map != null ) {
 			

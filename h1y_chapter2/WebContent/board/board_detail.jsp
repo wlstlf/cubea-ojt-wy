@@ -1,7 +1,7 @@
+<%@page import="dao.CommonDAO"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Map"%>
-<%@page import="dao.BoardMybatisDAO"%>
 <%@page import="util.MyUtil"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -9,7 +9,7 @@
 <%
 request.setCharacterEncoding("utf-8");
 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd ( hh:mm )");
-BoardMybatisDAO boardDao = new BoardMybatisDAO();
+CommonDAO commonDao = new CommonDAO();
 String session_param = (String)session.getAttribute("key");
 
 int bId = MyUtil.NumberFormatExUtil(request.getParameter("b_Id"), 0);
@@ -19,6 +19,10 @@ String bWriter = "";
 String bCDate = "";
 String bUDate = "";
 int bHit = 0;
+
+Map<String, Object> map = new HashMap<String, Object>();
+
+map.put("boardId", bId);
 
 //조회수 새로고침 중복 방지를 위한 쿠키 생성
 Cookie[] cookies = request.getCookies();
@@ -38,7 +42,7 @@ for ( Cookie cookie : cookies ) {
 		else {		
 			cookie.setValue(cookie.getValue() + "_" + request.getParameter("b_Id"));
 			response.addCookie(cookie);
-			boardDao.getUpHit(bId);
+			commonDao.update("getUpHit", map);
 		}
 				
 	}
@@ -48,10 +52,10 @@ for ( Cookie cookie : cookies ) {
 if( hit ) {
 	Cookie cookie1 = new Cookie(loginId + "_hit", request.getParameter("b_Id"));
 	response.addCookie(cookie1);
-	boardDao.getUpHit(bId);
+	commonDao.update("getUpHit", map);
 }
 
-Map<String, Object> boardDetail = boardDao.getBoardDetail(bId);
+Map<String, Object> boardDetail = commonDao.selectOne("getBoardDetail", map);
 
 // 페이지에 조회수 반영을 위해 맨 아래로
 if ( boardDetail != null ) {
@@ -65,7 +69,7 @@ if ( boardDetail != null ) {
 	bUDate = sdf.format(boardDetail.get("BOARD_UPDATE_DATE"));
 	bHit = Integer.parseInt(String.valueOf(boardDetail.get("BOARD_HIT")));
 	
-} else {
+} else if( boardDetail == null ) {
 	
 	out.println(MyUtil.alertAndLocationUtil("잘못된 접근입니다 :(", "./board_list.jsp"));
 	
@@ -158,7 +162,7 @@ if ( boardDetail != null ) {
 	                            <textarea style="width: 1100px" rows="3" cols="30" id="comment" name="comment" placeholder="댓글을 입력하세요"></textarea>
 	                            <br>
 	                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-	                                <a href='#' onClick="fn_comment('${result.code }')" class="btn btn-outline-primary">등록</a>
+	                                <a href='#' onClick="" class="btn btn-outline-primary">등록</a>
 	                            </div>
 	                        </td>
 	                    </tr>
@@ -171,11 +175,48 @@ if ( boardDetail != null ) {
 	<div class="container">
 	    <form id="commentListForm" name="commentListForm" method="post">
 	        <div id="commentList">
+				<div class="commentArea" style="border-bottom:1px solid darkgray; margin-bottom: 15px; width: 1110px;">
+					<div class="commentInfo">댓글번호: 1 / 작성자 : test
+						<div style="float: right;">
+							<a href="#"> 수정 </a>
+	                		<a href="#"> 삭제 </a>
+	                		<a href="#"> 답변 </a>
+	                	</div>	
+                	</div>
+                	<div class="commentContent">
+                		<div style="float: right;">
+                			<button class="btn btn-success btn-sm">좋아요</button>
+                			<button class="btn btn-danger btn-sm">싫어요</button>
+                		</div>
+                		<p> 내용 : test</p><hr style="border-top: 1px dashed #bbb;">
+                		<p>　┖ 한원용</p>
+					</div>
+				</div>
+	        </div>
+	        <div id="commentList">
+				<div class="commentArea" style="border-bottom:1px solid darkgray; margin-bottom: 15px; width: 1110px;">
+					<div class="commentInfo">댓글번호: 2 / 작성자 : test
+						<div style="float: right;">
+							<a href="#"> 수정 </a>
+	                		<a href="#"> 삭제 </a>
+	                		<a href="#"> 답변 </a>
+	                	</div>	
+                	</div>
+                	<div class="commentContent">
+                		<div style="float: right;">
+                			<button class="btn btn-success btn-sm">좋아요</button>
+                			<button class="btn btn-danger btn-sm">싫어요</button>
+                		</div>
+                		<p> 내용 : test</p><hr style="border-top: 1px dashed #bbb;">
+                		<p>　┖ 한원용</p><hr style="border-top: 1px dashed #bbb;">
+                		<p>　┖ 한원용</p><hr style="border-top: 1px dashed #bbb;">
+                		<p>　┖ 한원용</p>
+					</div>
+				</div>
 	        </div>
 	    </form>
 	</div>
 </div>
 <%@ include file="/include/footer.jsp" %>
-
 </body>
 </html>
