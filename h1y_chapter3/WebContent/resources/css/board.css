@@ -1,0 +1,74 @@
+@charset "UTF-8";
+
+.recommentDiv{
+	font-size: 14px;
+	margin-left: 20px;
+	width: 95%;
+}
+.recommentDiv .form-control{
+	width: 50%;
+	display: inline-block;
+}
+.recommentDiv p a{
+	margin-bottom: 6px; 
+	margin-left: 5px;
+}
+.replyDiv{
+	font-size: 15px;
+	color: #353535;
+	margin-bottom: 5px;
+	margin-top: 30px;
+}
+.replyDivUp{
+	border-bottom: 1px solid gray;
+	padding-bottom: 5px;
+}
+.replyDivUpIn{
+	display: inline-block;
+	float: right;
+}
+.replyDate{
+	float: right;
+}
+.commentContent{
+	margin-top: 7px;
+}
+.commentContent div{
+	float: right;
+}
+.commentContent div a:hover{
+	font-size: 16px;
+}
+.commentContent p input{
+	width: 50%;
+	display: inline-block;
+}
+.commentContent p a{
+	margin-bottom: 6px; 
+	margin-left: 5px;
+}
+div[id*=hiddenReply_] {
+	margin-left: 20px;
+}
+div[id*=hiddenReply_] .form-control{
+	width: 50%;
+	display: inline-block;
+}
+div[id*=hiddenReply_] a{
+	margin-bottom: 6px; 
+	margin-left: 5px;
+}
+.replyHr{
+	border-top: 1px dashed #bbb;
+}
+.nonReply{
+	margin-top: 50px;
+	text-align: center;
+	font-size: 20px;
+	color: #5D5D5D;
+}
+.deleteReply{
+	text-decoration:line-through;
+	font-size: 13px;
+	color: #8C8C8C;
+}

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ReplyMapper">
+	
+	<select id="getReplyList" parameterType="map" resultType="map">
+		SELECT 
+			A.*,
+			(
+				SELECT
+					COUNT(*)
+				FROM 
+					REPLY_UPDOWN
+				WHERE 
+					UPDOWN_UD = 'U'
+				AND 
+					UPDOWN_REPLY_ID = REPLY_ID
+			) AS UP,
+			(
+				SELECT
+					COUNT(*)
+				FROM 
+					REPLY_UPDOWN
+				WHERE 
+					UPDOWN_UD = 'D'
+				AND 
+					UPDOWN_REPLY_ID = REPLY_ID
+			) AS DOWN
+		FROM
+			REPLY A
+		WHERE
+			REPLY_BOARD_ID = #{boardId}
+		START WITH
+			REPLY_PARENT_ID = 0
+		CONNECT BY PRIOR
+			REPLY_ID = REPLY_PARENT_ID
+		ORDER SIBLINGS BY 
+			REPLY_CREATE_DATE DESC
+	</select>
+	
+	<select id="getUpDownCheck" parameterType="map" resultType="map">
+		SELECT 
+			REPLY_ID,
+			(
+				SELECT 
+					COUNT(*)
+				FROM 
+					REPLY_UPDOWN
+				WHERE 
+					UPDOWN_USER_ID = #{loginId}
+				AND 
+					UPDOWN_REPLY_ID = #{replyId}
+			) AS UD_COUNT
+		FROM 
+			REPLY 
+		WHERE 
+			REPLY_ID = #{replyId}
+	</select>
+	
+	<select id="getReplyCheck" parameterType="map" resultType="map">
+		SELECT
+			*
+		FROM
+			REPLY
+		WHERE 
+			REPLY_ID = #{replyId}
+	</select>
+	
+	<insert id="getReplyCreate" parameterType="map">
+		INSERT 
+		INTO 
+		    REPLY (
+		        REPLY_ID,
+		        REPLY_BOARD_ID,
+		        REPLY_LEVEL,
+		        REPLY_WRITER,
+		        REPLY_CONTENT,
+		        REPLY_CREATE_DATE,
+		        REPLY_PARENT_ID
+		    ) 
+		    VALUES (
+		        SEQ_REPLY_ID.NEXTVAL,
+		        #{boardId},
+		        #{replyLevel},
+		        #{writer},
+		        #{content},
+		        SYSDATE,
+		        #{parentId}
+		    )
+	</insert>
+	
+	<update id="getReplyUpdate" parameterType="map">
+		UPDATE
+			REPLY
+		SET 
+			REPLY_CONTENT = #{content},
+			REPLY_UPDATE_DATE = SYSDATE
+		WHERE
+			REPLY_ID = #{replyId}
+	</update>
+	
+	<update id="getReplyDeleteYN" parameterType="map">
+		UPDATE
+			REPLY
+		SET
+			REPLY_DELETE_YN = 'Y'
+		WHERE 
+			REPLY_ID = #{replyId}
+	</update>
+	
+	<insert id="getUpDownCreate" parameterType="map">
+		INSERT
+		INTO
+			REPLY_UPDOWN (
+				UPDOWN_ID,
+				UPDOWN_USER_ID,
+				UPDOWN_REPLY_ID,
+				UPDOWN_UD
+			)
+			VALUES (
+				SEQ_UPDOWN_ID.NEXTVAL,
+				#{loginId},
+				#{replyId},
+				#{ud}
+			)
+	</insert>
+	
+</mapper>
